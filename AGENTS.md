@@ -1,85 +1,14 @@
-# Signboard Agent Guide
+# Signboard for Omarchy
 
-This repository keeps its primary Codex-specific instructions in [CODEX.md](./CODEX.md).
+Use UK English in prose. This fork is a personal taskboard with a Node CLI and an Omarchy Quickshell/QML panel. The user's work is the subject of the board; it is not an agent execution queue.
 
-If you are an agent or tool that looks for `AGENTS.md`, use `CODEX.md` as the canonical source of repo guidance.
+Read `docs/architecture.md` for boundaries and `skills/signboard/SKILL.md` for the board workflow. The root `manifest.json` makes the repository an Omarchy panel plugin.
 
-## Minimum Rules
-
-- Read [CODEX.md](./CODEX.md) first.
-- Read [docs/codex/PROJECT_CONTEXT.md](./docs/codex/PROJECT_CONTEXT.md) for architecture and behavior.
-- Read [docs/codex/FILE_STRUCTURE.md](./docs/codex/FILE_STRUCTURE.md) for the repository map.
-- Read [DESIGN.md](./DESIGN.md) before changing the default theme, visual system, or UI component styling.
-- Keep research notes, QA reports, machine-specific release records, and agent handoff instructions local under ignored `.local/` or `output/` paths. Do not commit or upload them. Public documentation should describe the product and reusable development workflows.
-- Treat `app/signboard.js` as generated output; edit source modules in `app/**` or shared renderer modules such as `shared/appSettingsSchema.js`, then run `./buildjs.sh`.
-- Keep every runtime source root used by packaged code in `electron-builder.json`, including `bin/**` and `shared/**`; macOS distribution builds must pass `scripts/test-packaged-app-launch.js` before release.
-- Use `lib/atomicFile.js` for durable writes to Signboard-managed card, settings, sidecar, and Obsidian integration files.
-- Keep keyboard shortcut behavior, `index.html` shortcut help, and user-facing shortcut docs in sync.
-- Keep modal focus handling, live status announcements, reduced-motion behavior, forced-colors behavior, and keyboard-only focus styling in sync with `app/utilities/accessibility.js` and `static/styles.css`.
-- Mark body-level popovers that must remain interactive while a modal is active with `data-sb-modal-layer`, so the modal background inert handler does not disable them.
-- Keep right-click text editing context menu behavior in `main.js` in sync with editable renderer fields.
-- Keep native app menu actions and the Playwright native-menu regression aligned when changing menu behavior.
-- Keep native updater dialogs free of raw HTML/Markdown through `lib/updateReleaseNotes.js`; preserve HTML/entity normalization, link-target removal, `Downloads` section stripping, post-normalization truncation, the dev updater preview fixture, and `scripts/test-update-release-notes.js` together.
-- Keep Linux updater safety and release validation aligned across `lib/releaseArtifactValidation.js`, `lib/linuxPackageInstaller.js`, `lib/updateErrors.js`, `main.js`, `scripts/verify-release-assets.js`, and their focused tests; invalid `.deb`/`.pacman` files must be rejected before privileged installation or release publication, and Arch installation must never use the unsafe `pacman -Sy` partial-upgrade path.
-- Defer DOM/layout mutations after macOS native menu or `<select>` popup interactions with `waitForNativeMenuTrackingToSettle()` before replacing, disabling, rerendering, or moving controls.
-- Keep card drag/drop clone and placeholder behavior in sync with `app/utilities/cardDragTilt.js` and `static/styles.css`.
-- Keep card/list drag/drop filesystem ordering on the main-process transactional helpers in `lib/cardOrdering.js`; do not move reorder loops back into renderer code.
-- Keep the list-menu one-time due-date reorder aligned with Table due ordering: prefer the card due date, fall back to the earliest incomplete task due date, place undated cards last, and preserve existing relative order for ties and undated cards.
-- Preserve `lib/cardOrdering.js` unchanged-entry detection so transactional reorders do not rename unaffected files on slower disks.
-- Keep successful card drag/drop on the in-place returned-path update path; reserve full-board rerendering for reorder recovery so slower disks do not reread every card after each drop.
-- Keep native Arch/Omarchy `.pacman` packages in the standard Linux release matrix alongside AppImage and deb artifacts.
-- Keep electron-builder's `signboard://` protocol declaration aligned in `package.json` and `electron-builder.json` so packaged Linux desktop entries register the URL scheme.
-- Preserve the legacy `com.electron.signboard` packaged application ID so signed updates remain compatible with Signboard 1.6.0 and earlier installs; changing the application ID requires an explicit migration plan and update-path regression.
-- Omarchy theme following is an opt-in app setting shown only when the canonical active theme is detected; keep `lib/omarchyTheme.js`, main-process watching, preload events, `app/ui/theme.js`, app settings, Planner board-palette inheritance, Light/Dark/Auto opt-out behavior, and tests aligned. Non-default board color schemes must remain deliberate overrides.
-- MCP allowed roots include both explicit MCP roots and desktop trusted board roots; keep root loading, `get_config`, `signboard_list_boards`, and board-name resolution tests aligned.
-- CLI and MCP board discovery/creation should stay aligned: `signboard boards list` and `signboard_list_boards` report the same known-board metadata shape where applicable, while `signboard boards create` and `signboard_create_board` scaffold the same default lists and starter card.
-- Keep the advertised MCP tool inventory aligned across `lib/mcpServer.js`, `MCP_README.md`, `skills/signboard-mcp/SKILL.md`, and `scripts/test-mcp-server.js`.
-- CLI-created starter cards and CLI create, duplicate/template, edit, note, and move writes must keep flat Signboard/Obsidian metadata normalized through `lib/obsidianIntegration.js`, including destination-list metadata after a move.
-- Quick board switching uses `Cmd/Ctrl + K`, searches all currently open boards, and should keep tab switching, overflow tab switching, and switcher switching on the same safe board-switch helper.
-- Planner is the workspace-level home for Calendar, This Week, Day, and Agenda, including all-open-board and current-board shortcut scopes; keep `app/board/plannerView.js`, Kanban/Table board rendering, Table bulk-selection behavior, search/filter behavior, and shortcut docs aligned.
-- Keep the local-day rollover lifecycle in `app/init.js`, `shared/localDate.js`, `main.js` system-resume delivery, preload, Planner cursor reconciliation, board/date-status rendering, due notifications, and rollover tests aligned. Current Planner month/week/day cursors follow rollover only when they represented the previously current period; user-browsed periods remain pinned.
-- Normal board rendering uses `readBoardSnapshot` and `app/board/boardSnapshot.js` to batch list/card reads for Kanban, Table, and Planner; keep snapshot shape and consumers aligned.
-- Workspace-level keyboard shortcuts close the active card editor before changing context; editor-scoped card move/archive shortcuts should keep acting on the open card.
-- External board-change sync should refresh board cards and unchanged open card editors after MCP/card-file edits without overwriting local editor changes.
-- Card timestamp UI and automation surfaces use `timestamps.createdAt` and `timestamps.updatedAt`; keep editor timestamp display, Table age columns/sorting, CLI age sorts, and MCP card responses aligned with the shared timestamp helpers.
-- Obsidian integration writes flat Obsidian-friendly card properties, detects containing vaults by walking upward for `.obsidian`, auto-creates/updates managed `Signboard Board.base` files without overwriting user-customized Bases, supports metadata-only linked Obsidian notes named `Linked Signboard Note.md` from the card editor only for cards inside detected vaults, shows the Obsidian-vault-required info modal for linked-note/Base actions outside a vault, and resolves `signboard://open-card` links only through trusted board roots. Board activation may ensure the managed Base but must not rewrite card Markdown; bulk metadata reconciliation belongs to imports, board moves, and explicit Base actions. `signboard://open-board?path=...` opens validated vault-contained board folders after confirmation. The optional Obsidian companion plugin lives in `obsidian-plugin/` and can create/open Signboard boards from Obsidian. Linked objects use structured `linked_objects` frontmatter for Obsidian notes, local files/folders, web URLs, app deep links, and Signboard links; local files can be linked by picker or by dragging files onto the card editor, and Kanban/Table linked-object counts use `app/utilities/linkedObjects.js`. Raw web URLs in the card body stay as Markdown text but are visually marked in the OverType preview and opened through `window.electronAPI.openExternal` from the inline open button or Cmd/Ctrl-click. Keep `lib/obsidianIntegration.js`, `main.js`, preload, renderer menus/views, plugin helpers, and docs aligned.
-- The sponsorship modal opens from the Board menu "Sponsor" action, About modal action, and fixed bottom-right "Sponsor" pill; the pill hides on compact windows to avoid covering board lists and can be dismissed locally.
-- Quick Add card creation supports board/list selection across open boards, a header `Card` button, an optional app-level global shortcut while Signboard is running, and `Shift + Enter` to create, immediately open, and focus the notes field on the new card.
-- Settings groups app-wide panels as General, Notifications, and Smart Actions, followed by current-board panels ordered General, Labels, Appearance, Workflow, Obsidian, and Import; board General includes board rename, move, and duplicate actions.
-- AI assistance is opt-in in App Settings. Ollama settings and Smart Card Action prompts live in app settings, default Smart Card Action prompts live in `shared/appSettingsSchema.js`, main-process AI requests run through `lib/aiTaskSuggestions.js`, settings verify the configured Ollama URL through `/api/tags` and load installed models into a refreshable dropdown, and the Card Editor floating Smart Card Actions button must preview generated titles, summaries, task lists, smart paste Markdown, auto-label suggestions, due-date suggestions, linked-object attachment suggestions, question answers, and custom-action output before changing a card. Smart Actions settings show drag-reorderable accordion action rows; new custom actions appear at the top and can be expanded to edit the label, target, and prompt. Custom Content actions append Markdown rather than replacing existing notes. The built-in Quick Smart Action is reorderable but has no stored prompt; it collects a one-off prompt and target in the card editor. The built-in Question the Card action is reorderable but has no stored prompt, sends a one-off question plus card context, and returns a read-only answer with a follow-up prompt without writing card data or storing chat history. The card editor Smart Actions popover stays anchored above the floating button across menu/result/back states. Generated task-list quantity lives in the prompt text, not a separate setting. Auto-label suggestions must resolve to existing current-board labels and merge only new label IDs into the card.
-- Card `start` frontmatter and task `(start: YYYY-MM-DD)` / `(scheduled: YYYY-MM-DD)` markers feed Kanban, Table, Planner, CLI, MCP, and importers alongside due dates; completed checklist date markers and completed-list cards stay non-actionable by default.
-- Kanban cards and the card editor show card-level `start` and `due` through one compact calendar-based Dates control and shared popover; task lines use one calendar control per task for start/due editing.
-- Card label popovers can create board labels inline, open the board's Labels settings from a gear shortcut, and Add Card/Quick Add can preselect active-board labels before creating a card.
-- External Published Calendar is opt-in in App Settings, served only on `127.0.0.1`, and board inclusion is controlled in each board's Workflow settings.
-- Completed-list workflow settings live in board settings; Planner, board date filters, and due notifications treat completed-list cards as non-actionable by default while preserving due dates.
-- Completed task-list item date markers should not keep cards in Planner/date-filter views; only incomplete task start/due markers should place cards there.
-- Keep agent-facing docs up to date: [CODEX.md](./CODEX.md), [AGENTS.md](./AGENTS.md), [docs/codex/PROJECT_CONTEXT.md](./docs/codex/PROJECT_CONTEXT.md), and [docs/codex/FILE_STRUCTURE.md](./docs/codex/FILE_STRUCTURE.md).
-- Keep release-facing docs up to date when user behavior or CLI behavior changes: [docs/README.md](./docs/README.md), [docs/using-signboard.md](./docs/using-signboard.md), [docs/signboard-cli.md](./docs/signboard-cli.md), [readme.md](./readme.md), and [MCP_README.md](./MCP_README.md) when relevant.
-
-When in doubt, follow [CODEX.md](./CODEX.md).
-
-## 1.7.3 maintenance invariants
-
-- Card reads share the bounded queue in `lib/fileReadQueue.js`; preserve ordering and partial-read errors, and keep Kanban/Table/Planner warnings visible when snapshots are incomplete.
-- Exact CLI filenames scoped to a list avoid reading unrelated cards. Keep case-insensitive ambiguity handling and one-pass task metadata aligned with fallback lookups.
-- `lib/allowedPaths.js` enforces canonical MCP roots for existing paths, new destinations, and nested bulk-operation paths. Validate legacy settings and archive paths too; explicitly allowed symlink roots must still work.
-- MCP create/update/duplicate/move and previews normalize destination metadata, and explicit date writes reject impossible dates before mutation.
-- Prefix padding is a minimum of three digits, not a three-digit maximum. Keep desktop, CLI, MCP, imports, archive, discovery, and list display parsing aligned beyond 999.
-- Directory renames use `lib/directoryRename.js` for metadata/workflow reconciliation and rollback on write failure. Preserve unrelated frontmatter and avoid silently overwriting concurrently edited files.
-- Atomic replacements preserve existing POSIX permission bits while retaining temp-file cleanup and fsync behavior.
-- MCP agent launch configurations use `bin/signboard-mcp.js` with `ELECTRON_RUN_AS_NODE=1`; source configuration generation uses `bin/signboard-mcp-config.js`. Desktop compatibility flags remain available.
-- Card deep links reveal the desktop window and wait for saved-workspace restoration before changing renderer context. Closing the last window still quits the app; cold-start links must reopen the requested card.
-- Board panning is mouse-only on the empty background, with capture/cancel/blur cleanup. Long title and preview text wraps within cards.
-- Run `npm run test:maintenance`, focused/full Electron tests, and packaged launch checks for this maintenance work. Follow `docs/codex/TESTING.md` for isolated target validation and consult ignored `.local/codex/` host instructions when present.
-
-## Appearance and Planner — 1.7.4
-
-- The searchable scheme combobox lives in `app/ui/colorSchemePicker.js`; typing/arrows only browse, Enter/click applies, and Escape/Tab cancels browsing. `Cmd/Ctrl + Shift + T` and View > Choose Color Scheme open Appearance with search focused. Keep native/preload/renderer shortcuts, modal dismissal, selected-board restoration, and help aligned.
-
-- Light/Dark/Auto lives in Settings > Appearance as accessible preview radio buttons. Mode is app-wide in `appearance.mode`; empty values migrate the legacy localStorage choice. Auto observes `prefers-color-scheme` live; explicit choices and the existing toggle shortcut leave Omarchy following. Preserve choice during older save responses.
-- Planner inherits the selected Kanban/Table board scheme. Its temporary foreign-card editor context must preserve persisted selection, filters, source-board labels/list writes, and the Planner palette; restore after save/close, failed open, or a workspace shortcut. A card’s Labels-settings shortcut retains its context until Settings closes.
-- Routine Electron tests use `npm run test:playwright` on a configured Linux host’s isolated Xvfb desktop. Local GUI tests require explicit permission and `npm run test:playwright:local`; see `docs/codex/PLAYWRIGHT_TESTING.md`.
-
-- Skip unchanged card-editor saves against `activeEditorDiskState`; initialization/theme callbacks must not rewrite cached content over an external edit. Keep the external-editor-refresh regression aligned.
-
-- Release builds share one stamp in `config/build-info.json`: run `npm run build:stamp -- --channel release` once after source changes, commit it, and reuse it on every builder. The packaging hook rejects stale/missing stamps. About and `signboard --version [--json]` report the build and source fingerprint; updater versions remain unchanged. See `docs/build-identity.md`.
+- Preserve upstream Markdown card IDs, unknown frontmatter and ordering conventions.
+- Use `lib/atomicFile.js` for durable writes. Keep board mutations under the CLI lock.
+- Keep CLI help, the skill and README consistent with behaviour.
+- Use argument arrays for agent launches. Respect the default agent selected by Omarchy.
+- Use `qs.Commons.Color` for QML theme colours. Keep the GUI usable by keyboard.
+- Run `npm test` and `npm run test:upstream` for CLI/storage changes. Validate QML with an isolated Quickshell harness; do not launch a paid agent as a test.
+- Keep machine-specific QA output and screenshots under ignored `.local/` or `output/`.
+- Do not reintroduce Electron or MCP dependencies.

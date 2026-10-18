@@ -1,140 +1,25 @@
 {
-  "name": "signboard",
-  "productName": "Signboard",
-  "version": "1.7.4",
-  "description": "A fast, local-first Kanban board for Markdown files.",
-  "homepage": "https://github.com/cdevroe/signboard",
+  "name": "signboard-omarchy",
+  "version": "0.1.0",
+  "description": "Personal sprint taskboard for Omarchy, maintained through a CLI and agents.",
+  "license": "MIT",
+  "author": "Jeremy Stokes; based on Signboard by Colin Devroe",
   "repository": {
     "type": "git",
-    "url": "https://github.com/cdevroe/signboard.git"
+    "url": "https://github.com/jeremystokese2/signboard.git"
   },
-  "license": "MIT",
-  "author": "Colin Devroe <colin@cdevroe.com> (https://cdevroe.com)",
-  "main": "main.js",
   "bin": {
-    "signboard": "./bin/signboard.js"
+    "signboard": "bin/signboard.js"
   },
-  "build": {
-    "protocols": [
-      {
-        "name": "Signboard",
-        "schemes": [
-          "signboard"
-        ]
-      }
-    ],
-    "artifactName": "signboard_${version}_${os}_${arch}.${ext}",
-    "nsis": {
-      "artifactName": "signboard_${version}_${os}.${ext}",
-      "buildUniversalInstaller": true
-    }
+  "engines": {
+    "node": ">=22"
   },
-  "private": true,
   "scripts": {
-    "prestart": "npm run build:js",
-    "start": "electron .",
-    "cli": "node ./bin/signboard.js",
-    "mcp:server": "node bin/signboard-mcp.js",
-    "mcp:config": "node bin/signboard-mcp-config.js",
-    "build:icons": "node scripts/generate-icons.js",
-    "build:js": "./buildjs.sh",
-    "test:cli": "node scripts/test-cli.js",
-    "test:cli-install": "node scripts/test-cli-install.js",
-    "test:desktop-cli": "node scripts/test-desktop-cli.js",
-    "test:frontmatter": "node scripts/test-frontmatter.js",
-    "test:card-ordering": "node scripts/test-card-ordering.js",
-    "test:board-labels": "node scripts/test-board-labels.js",
-    "test:board-snapshot": "node scripts/test-board-snapshot.js",
-    "test:board-duplication": "node scripts/test-board-duplication.js",
-    "test:app-settings": "node scripts/test-app-settings.js",
-    "test:ai-task-suggestions": "node scripts/test-ai-task-suggestions.js",
-    "test:mcp": "node scripts/test-mcp-server.js",
-    "test:board-card-metadata": "node scripts/test-board-card-metadata.js",
-    "test:board-views": "node scripts/test-board-views.js",
-    "test:due-notifications": "node scripts/test-due-notifications.js",
-    "test:external-calendar": "node scripts/test-external-published-calendar.js",
-    "test:task-list": "node scripts/test-task-list-parser.js",
-    "test:card-timestamps": "node scripts/test-card-timestamps.js",
-    "test:local-date": "node scripts/test-local-date.js",
-    "test:update-release-notes": "node scripts/test-update-release-notes.js",
-    "test:update-errors": "node scripts/test-update-errors.js",
-    "test:linux-package-installer": "node scripts/test-linux-package-installer.js",
-    "test:omarchy-theme": "node scripts/test-omarchy-theme.js",
-    "test:release-artifacts": "node scripts/test-release-artifact-validation.js",
-    "test:packaging-config": "node scripts/test-packaging-config.js",
-    "test:packaged-app-launch": "node scripts/test-packaged-app-launch.js",
-    "test:archive": "node scripts/test-archive.js",
-    "test:obsidian-integration": "node scripts/test-obsidian-integration.js",
-    "test:obsidian-plugin": "node scripts/test-obsidian-plugin.js",
-    "test:import-trello": "node scripts/test-import-trello.js",
-    "test:import-obsidian": "node scripts/test-import-obsidian.js",
-    "test:import-tasksmd": "node scripts/test-import-tasksmd.js",
-    "test:timestamp": "node scripts/test-timestamp-format.js",
-    "test:playwright": "node scripts/run-playwright.js",
-    "migrate:legacy-cards": "node scripts/migrate-legacy-cards.js",
-    "dist": "npm run dist:mac",
-    "dist:mac": "npm run build:js && electron-builder --config electron-builder.json --mac --universal --publish never && npm run test:packaged-app-launch -- --app dist/mac-universal/Signboard.app",
-    "dist:mac:arm64": "npm run build:js && electron-builder --config electron-builder.json --mac --arm64 --publish never && npm run test:packaged-app-launch -- --app dist/mac-arm64/Signboard.app",
-    "dist:mac:arm64:no-notarize": "CSC_IDENTITY_AUTO_DISCOVERY=false SIGNBOARD_SKIP_NOTARIZATION=1 npm run build:js && CSC_IDENTITY_AUTO_DISCOVERY=false SIGNBOARD_SKIP_NOTARIZATION=1 electron-builder --config electron-builder.json --mac --arm64 --publish never && npm run test:packaged-app-launch -- --app dist/mac-arm64/Signboard.app",
-    "dist:mac:x64": "npm run build:js && electron-builder --config electron-builder.json --mac --x64 --publish never && npm run test:packaged-app-launch -- --app dist/mac/Signboard.app",
-    "dist:mac:universal": "npm run build:js && electron-builder --config electron-builder.json --mac --universal --publish never && npm run test:packaged-app-launch -- --app dist/mac-universal/Signboard.app",
-    "dist:mac:all": "npm run dist:mac:arm64 && npm run dist:mac:x64 && npm run dist:mac:universal",
-    "dist:macarm64": "npm run dist:mac:arm64",
-    "dist:macx64": "npm run dist:mac:x64",
-    "dist:macuniversal": "npm run dist:mac:universal",
-    "dist:win": "npm run build:js && electron-builder --config electron-builder.json --win nsis --x64 --arm64 --publish never",
-    "dist:win:x64": "npm run build:js && electron-builder --config electron-builder.json --win nsis --x64 --publish never",
-    "dist:win:arm64": "npm run build:js && electron-builder --config electron-builder.json --win nsis --arm64 --publish never",
-    "dist:win:all": "npm run dist:win",
-    "dist:winarm64": "npm run dist:win:arm64",
-    "dist:winx64": "npm run dist:win:x64",
-    "dist:linux": "npm run dist:linux:all",
-    "dist:linux:x64": "npm run build:js && electron-builder --config electron-builder.json --linux AppImage deb pacman --x64 --publish never",
-    "dist:linux:arm64": "npm run build:js && electron-builder --config electron-builder.json --linux AppImage deb pacman --arm64 --publish never",
-    "dist:linux:all": "npm run dist:linux:x64 && npm run dist:linux:arm64",
-    "dist:linux:rpm:x64": "npm run build:js && electron-builder --config electron-builder.json --linux rpm --x64 --publish never",
-    "dist:linux:rpm:arm64": "npm run build:js && electron-builder --config electron-builder.json --linux rpm --arm64 --publish never",
-    "dist:linux:rpm:all": "npm run build:js && electron-builder --config electron-builder.json --linux rpm --x64 --arm64 --publish never",
-    "dist:linux:pacman:x64": "npm run build:js && electron-builder --config electron-builder.json --linux pacman --x64 --publish never",
-    "dist:linux:pacman:arm64": "npm run build:js && electron-builder --config electron-builder.json --linux pacman --arm64 --publish never",
-    "dist:linux:pacman:all": "npm run build:js && electron-builder --config electron-builder.json --linux pacman --x64 --arm64 --publish never",
-    "dist:all": "npm run dist:mac && npm run dist:win && npm run dist:linux",
-    "release:verify": "node scripts/verify-release-assets.js",
-    "release:verify:partial": "node scripts/verify-release-assets.js --allow-partial",
-    "release:prepare": "npm run dist:all && npm run release:verify",
-    "test:maintenance": "node scripts/test-maintenance.js",
-    "test:playwright:local": "node scripts/run-playwright.js --local",
-    "test:playwright:runner": "node scripts/test-playwright-runner.js",
-    "test:board-theme-palettes": "node scripts/test-board-theme-palettes.js",
-    "build:stamp": "npm run build:js && node scripts/stamp-build.js",
-    "build:check": "node scripts/stamp-build.js --check",
-    "test:build-info": "node scripts/test-build-info.js"
-  },
-  "devDependencies": {
-    "@fiahfy/icns": "^0.0.7",
-    "@playwright/test": "^1.58.2",
-    "dotenv": "^17.3.1",
-    "electron": "^40.10.1",
-    "electron-builder": "^26.8.1",
-    "png-to-ico": "^3.0.1",
-    "sharp": "^0.34.5"
-  },
-  "overrides": {
-    "@xmldom/xmldom": "0.8.12",
-    "ajv": "6.14.0",
-    "lodash": "4.18.1",
-    "picomatch": "4.0.4",
-    "tar": "7.5.13",
-    "minimatch@3": "3.1.4",
-    "minimatch@5": "5.1.8",
-    "minimatch@9": "9.0.7",
-    "minimatch@10": "10.2.5",
-    "brace-expansion@1": "1.1.13",
-    "brace-expansion@2": "2.0.3",
-    "brace-expansion@5": "5.0.5"
+    "test": "node --test tests/sprint.test.js",
+    "test:upstream": "node scripts/test-cli.js && node scripts/test-frontmatter.js && node scripts/test-card-ordering.js",
+    "cli": "node bin/signboard.js"
   },
   "dependencies": {
-    "electron-updater": "^6.8.3",
     "js-yaml": "^4.1.1",
     "turndown": "^7.2.2"
   }

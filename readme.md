@@ -1,402 +1,83 @@
-# Signboard
+# Signboard for Omarchy
 
-Signboard is a local-first desktop kanban app that stores your lists as directories and cards as Markdown files on disk.
+A personal sprint taskboard, maintained through a CLI or an agent, with a native QML window in Omarchy's shell.
 
-Signboard is free for personal use. If you are using Signboard for your work, it would be appreciated if you make the commercial-use sponsorship payment to support future development. See the app's "Sponsor" button.
+Forked from [Colin Devroe's Signboard](https://github.com/cdevroe/signboard). The fork retains its Markdown cards, atomic file writes, ordering, archive and import support. The desktop Electron application and MCP server have been removed.
 
-Signboard is over 1 year old now. Starting in Signboard 2.0.0 there will be Pro-only features. Signboard Pro will cost $49/year.
+## What it does
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
-[![GitHub issues](https://img.shields.io/github/issues/cdevroe/signboard)](https://github.com/cdevroe/signboard/issues)
-[![GitHub pull requests](https://img.shields.io/github/issues-pr/cdevroe/signboard)](https://github.com/cdevroe/signboard/pulls)
-[![Donate](https://img.shields.io/badge/Donate-388307)](https://cdevroe.com/donate)
+- Stories form taskboard rows; task cards appear under To do, Doing, Waiting and Done.
+- Select the current sprint, another sprint, the backlog or all work.
+- See completed tasks, active work against a WIP limit, planned hours against capacity, and missing estimates.
+- Select a card to inspect its notes and change its status.
+- Prompt your default Omarchy agent from the board, with the selected card, board and sprint included as context.
+- Watch changes from agents and background jobs appear automatically.
 
----
+The prompt box launches the agent in Omarchy's normal terminal using `omarchy agent prompt`. The conversation continues in that terminal. The taskboard stays open and refreshes as the agent writes. There is no embedded chat transcript or model subscription in this fork.
 
-## ✨ Highlights
-- 📂 Cards saved as Markdown files
-- 💎 Full Obsidian integration (Bases generation, linked objects, etc.)
-- 🖌️ Color scheme per board (dozens to choose from and compatible with Omarchy theme switching)
-- 🌙 Light, Dark, and Automatic modes
-- 🏷 Custom labels per board
-- 🗓 Start and Due dates for cards and task list items
-- 📋 Planner, Kanban, and Table views
-- 🗂 Planner views include Calendar, This Week, Day, and Agenda views for actionable dated work across open boards
-- 📆 Optional local External Published Calendar feed for calendar app subscriptions
-- 🔎 Live search
-- 🗄️ Linked files and URLs on cards
-- ✨ Optional local AI Smart Card Actions
-- ⚡ Unlimited open boards with overflow tabs and a quick switcher
-- ⌨️ Tons of keyboard shortcuts!
-- ♿ Accessible!
-- 🤖 MCP server
-- 💻 CLI
-- ⌨️ TUI (coming in 2.0.0)
+## Install on Omarchy
 
----
-
-## Installation
-
-1. Go to the [Releases page](https://github.com/cdevroe/signboard/releases).
-2. On the latest release, use the curated download links in the release body:
-   - `Download for macOS (Universal)`
-   - `Download for Windows`
-   - Linux packages grouped by package type with explicit `x64` and `ARM64` labels
-
-On Arch Linux or Omarchy, download the matching `.pacman` package and install it with:
+Requires Node.js 22 or newer, npm, and an Omarchy version with the Quickshell plugin API and `omarchy agent prompt`.
 
 ```bash
-sudo pacman -U ./signboard_VERSION_linux_x64.pacman
-```
-
-The package installs Signboard, its launcher entry, its `signboard://` URL handler, and its icon together. It does not require FUSE. Use the `linux_aarch64.pacman` package on an ARM machine. The AppImage remains available for other distributions.
-
-For standard releases, Signboard intentionally promotes a smaller public download set:
-
-- macOS: universal build
-- Windows: single installer
-- Linux: separate `x64` and `ARM64` AppImage, deb, and Arch/Omarchy packages
-
-### Arch Linux (AUR)
-
-On Arch Linux and Arch-based distributions, Signboard is available on the [Arch User Repository](https://aur.archlinux.org/packages/signboard-appimage) as `signboard-appimage` for `x86_64` and `aarch64`. The package is maintained by the community [`missing-aur`](https://github.com/Cleboost/missing-aur) project; updates may follow the official release.
-
-Install with your preferred AUR helper:
-
-```bash
-yay -S signboard-appimage
-# or
-paru -S signboard-appimage
-```
-
-## Documentation
-
-- [Documentation hub](./docs/README.md)
-- [Using Signboard](./docs/using-signboard.md)
-- [Signboard CLI](./docs/signboard-cli.md)
-- [MCP Server](./MCP_README.md)
-- [File format and backups](./docs/file-format.md)
-
-### Keyboard Shortcuts
-
-On macOS, use `Cmd`. On Windows and Linux, use `Ctrl`.
-
-- `Cmd/Ctrl + /`: open keyboard shortcuts
-- `Cmd/Ctrl + K`: switch between currently open boards
-- `Cmd/Ctrl + N`: quick add a card to any open board
-- `Cmd/Ctrl + Shift + N`: create a list
-- `Cmd/Ctrl + 1`: return to Kanban and close Planner
-- `Cmd/Ctrl + Option/Alt + 1`: switch to Table and close Planner
-- `Cmd/Ctrl + 2`: open Planner Calendar for all open boards
-- `Cmd/Ctrl + 3`: open Planner This Week for all open boards
-- `Cmd/Ctrl + Shift + P`: open or close Planner
-- `Cmd/Ctrl + 4`: open Planner Day for all open boards
-- `Cmd/Ctrl + 5`: open Planner Agenda for all open boards
-- `Cmd/Ctrl + Option/Alt + 2`: open Planner Calendar for the current board
-- `Cmd/Ctrl + Option/Alt + 3`: open Planner This Week for the current board
-- `Cmd/Ctrl + Option/Alt + 4`: open Planner Day for the current board
-- `Cmd/Ctrl + Option/Alt + 5`: open Planner Agenda for the current board
-- `Cmd/Ctrl + ,`: open Settings
-- `Cmd/Ctrl + Shift + T`: open Appearance with color-scheme search focused
-- `Cmd/Ctrl + Shift + D`: toggle light and dark mode
-- `Cmd + Control + Shift + C` on macOS, `Ctrl + Alt + Shift + C` elsewhere: cycle board color schemes
-- `Cmd/Ctrl + Shift + [`: move the open card to the previous list
-- `Cmd/Ctrl + Shift + ]`: move the open card to the next list
-- `Cmd/Ctrl + Option/Alt + Shift + Backspace`: archive the open card
-- `Cmd/Ctrl + Shift + A`: open Archive
-- `Cmd/Ctrl + F`: focus board search or Planner search
-- `Esc`: close open modals
-
-In board search, Planner search, and archive search, `Enter` or `Arrow Down` moves from the search field to the first visible result, arrow keys move between visible results, and `Enter` or `Space` opens or selects the focused result.
-
-Board tabs, list actions, label/filter popovers, and Settings sections support arrow-key navigation. `Home` and `End` jump to the edges, `Esc` closes popovers, and `Delete` / `Backspace` closes a focused board tab.
-
-When a card is open, workspace-level shortcuts such as create, board switcher, Planner/view switching, Settings, Archive, and search close the card first. Card-specific shortcuts such as moving or archiving the open card still act on that card.
-Use the header `Card` button or `Cmd/Ctrl + N` to open Quick Add. In the Quick Add card modal, choose the board and list before creating the card. `Shift + Enter` creates the card, opens it immediately, and focuses the notes field. App Settings can also register an optional global Quick Add shortcut that works while Signboard is open.
-
-You can also open the shortcut helper from `Help > Keyboard Shortcuts`.
-
-Editable fields, including the card title and body editor, support the native right-click text editing menu for cut, copy, paste, delete, and select all.
-
-Raw `http://`, `https://`, and `www.` URLs typed in the card body are visually marked in the editor. Use the inline open-link control or Cmd/Ctrl-click the URL to open it in your default browser without changing the card's Markdown.
-
-Cards, list actions, and dialogs are keyboard-operable, with screen-reader status announcements for common actions. Focus indicators appear for keyboard navigation without adding persistent outlines to the card editor for pointer users.
-
-## 🤖 MCP Server
-
-Signboard includes a built-in MCP server so agents can interact with local boards.
-
-- Dedicated instructions: [MCP_README.md](./MCP_README.md)
-- To copy config: `Help` -> `Copy MCP Config`
-- MCP uses `signboard_list_boards` plus both explicit allowed roots and Signboard's desktop trusted/open board state for board lookup.
-- Optional agent skill: `skills/signboard-mcp/SKILL.md`
-
-## 💻 CLI
-
-Signboard includes a terminal CLI for direct board management without going through MCP.
-
-- Full guide: [docs/signboard-cli.md](./docs/signboard-cli.md)
-
-- In the desktop app on macOS/Linux: `Help` -> `Install Signboard CLI`
-- Use `signboard boards list --json` to list known boards before choosing one
-- Use `signboard use /Path/to/Board` once to remember the active board for later commands
-- Use `signboard boards create /Path/to/NewBoard --use` to create and select a new board from the terminal
-- The installed `signboard` wrapper runs the bundled CLI in Electron's Node mode, avoiding desktop app startup for terminal commands.
-- CLI-created, duplicated, edited, and moved cards keep the same flat Signboard/Obsidian properties as cards written in the desktop app, so they remain visible in managed Obsidian Bases.
-
-Examples:
-
-```bash
-# Select a board once
-signboard boards list --json
-signboard use /Path/to/Board
-
-# Create a board
-signboard boards create /Path/to/NewBoard --use
-
-# Lists
-signboard lists
-signboard lists create "Waiting"
-signboard lists rename "Waiting" "Blocked"
-
-# Cards
-signboard cards --due next:7
-signboard cards "To do"
-signboard cards --label Urgent --search launch
-signboard cards create --list "To do" --title "Ship release notes" --start 2026-03-18 --due 2026-03-20
-signboard cards edit --card ab123 --due none --move-to Doing
-signboard cards duplicate --card ab123 --list Leads --remove-label Template --dry-run --json
-signboard cards create --from-card ab123 --list Leads --title "New lead"
-signboard cards notes add --card ab123 --text "Emailed follow-up" --timestamp
-signboard cards read --list Doing --card ab123
-
-# Imports
-signboard import trello --file ~/Downloads/trello-export.json
-signboard import obsidian --source ~/Vault/Kanban.md --source ~/Vault/Boards/
-signboard import tasksmd --source ~/TasksWorkspace/tasks/Project-A
-
-# Or run through the packaged app executable
-/Applications/Signboard.app/Contents/MacOS/Signboard use /Path/to/Board
-/Applications/Signboard.app/Contents/MacOS/Signboard cards --due next:7
-```
-
-Interesting card listing filters:
-
-- `--due today`
-- `--due tomorrow`
-- `--due overdue`
-- `--due this-week`
-- `--due next:7` / `next:14` / `next:30`
-- `--due-source card|task|any`
-- `--label <name-or-id>` (repeatable)
-- `--label-mode any|all`
-- `--search <query>`
-- `--sort list|due|title|updated|updated-oldest|updated-newest|created-oldest|created-newest`
-- `--json` for scripting output
-
-Import options:
-
-- `signboard import trello --file <export.json> [--board <path>] [--json]`
-- `signboard import obsidian --source <path> [--source <path> ...] [--board <path>] [--json]`
-- `signboard import tasksmd --source <path> [--board <path>] [--json]`
-
-## Obsidian Integration
-
-Signboard boards can live inside an Obsidian vault. A good layout is `Vault/Project/Signboard/<Board Name>/`; avoid making a board a nested Obsidian vault with its own `.obsidian` folder. You can move an existing board into a vault with `Settings > General > Move Board`.
-
-If the board is inside a detected vault, the card's Open With menu shows Obsidian actions for opening the card and copying an Obsidian URI.
-
-Use the paperclip control next to labels to link Obsidian notes, local files, folders, web URLs, app deep links, and `signboard://` links. You can also drag local files onto the open card editor to link them to that card.
-
-Inside a vault, Signboard automatically creates `Signboard Board.base` for Obsidian Bases and keeps it current while it is still Signboard-managed. If you customize the Base in Obsidian, Signboard leaves it alone until you choose Settings > Obsidian > Generate Base again.
-
-An optional desktop-only Obsidian companion plugin lives in `obsidian-plugin/`. Enable it to open/copy Signboard links, attach active Obsidian notes to Signboard cards, handle `obsidian://signboard?cardId=...`, and right-click a folder to `Create Signboard`.
-
-Example task checklist syntax:
-
-```md
-- [ ] Draft update
-- [ ] (start: 2026-03-18) Outline proposal
-- [x ] (due: 2026-03-20) Send proposal
-- [ ] (scheduled: 2026-03-21) Follow up
-- [ X] Confirm scope
-- [ x ] Share notes
-```
-
-## 🔄 Automatic Updates
-
-- The Signboard app can check for updates automatically.
-- You can manually check any time from `Check for Updates...`:
-  - macOS: Signboard app menu
-  - Windows/Linux: Help menu
-- Use `View changelog` for the complete release page.
-- On Ubuntu, Signboard validates a downloaded `.deb` before requesting administrator access.
-- On Arch Linux and Omarchy, Signboard recognizes the downloaded `.pacman`, validates it with `pacman -Qp`, and installs it with `pkexec pacman -U`.
-
----
-
-## 🛠 Development
-
-```bash
-git clone https://github.com/cdevroe/signboard.git
+git clone https://github.com/jeremystokese2/signboard.git
 cd signboard
-npm install
-npm start
+./scripts/install.sh
 ```
 
-### Tests
+The installer installs Node dependencies without lifecycle scripts, links this checkout into the user plugin directory, links the CLI under `~/.local/bin`, and enables the plugin. It refuses to replace an unrelated existing plugin or CLI. Keep the checkout in place while installed.
 
 ```bash
-npm run test:frontmatter
-npm run test:board-labels
-npm run test:board-snapshot
-npm run test:board-duplication
-npm run test:app-settings
-npm run test:ai-task-suggestions
-npm run test:board-card-metadata
-npm run test:due-notifications
-npm run test:task-list
-npm run test:obsidian-integration
-npm run test:mcp
-npm run test:cli
-npm run test:cli-install
-npm run test:desktop-cli
-npm run test:card-ordering
-npm run test:board-views
-npm run test:card-timestamps
-npm run test:timestamp
-npm run test:external-calendar
-npm run test:archive
-npm run test:playwright
-npm run test:import-trello
-npm run test:import-obsidian
-npm run test:import-tasksmd
-npm run test:obsidian-plugin
-npm run test:packaging-config
-npm run release:verify
+signboard init ~/Documents/Workboard
+signboard sprint create 'This week' --goal 'Prepare the proposal' --capacity 12 --wip 2
+signboard sprint start 'This week'
+signboard gui
 ```
 
-`npm run test:playwright` runs Electron tests on a configured Linux host in an isolated virtual desktop. To run them on your own desktop, use `npm run test:playwright:local`; test windows may take focus. See [Playwright testing](./docs/codex/PLAYWRIGHT_TESTING.md) for setup.
+The GUI can also be summoned using `omarchy-shell shell summon jeremy.signboard '{}'`. It uses the CLI's selected board unless passed a `board` path in the payload. Configure your default agent through Omarchy if you have not already done so.
 
----
+## Agent skill
 
-## 📦 Distribution Builds
-
-After changing source, run `npm run build:stamp -- --channel release` once, commit the stamp with the source, and use that same snapshot on every build machine. See [build identity](./docs/build-identity.md).
-
-### macOS
+The GUI includes the bundled skill's absolute path with every prompt. For automatic discovery elsewhere, link it into your agent's skills folder:
 
 ```bash
-# Default public macOS release build
-npm run dist:mac
-
-# Optional: specific macOS architectures for troubleshooting
-npm run dist:mac:universal
-npm run dist:mac:arm64
-npm run dist:mac:x64
-
-# Optional: build every macOS variant
-npm run dist:mac:all
+signboard skill install --target ~/.codex/skills
+# Or use the corresponding skills folder for another agent.
+signboard skill show
 ```
 
-Each macOS distribution command finishes with isolated launch tests for the packaged app, CLI, and MCP server. The build fails if any of them cannot start.
+The skill teaches the CLI, task decomposition, personal sprint planning, WIP, estimates, blockers and explicit carryover. It treats the board as a record of your work. Adding a task is not permission for an agent to execute that task.
 
-### Windows (NSIS installer)
+## CLI
 
 ```bash
-# Default public Windows release build
-npm run dist:win
-
-# Alias for the default Windows release build
-npm run dist:win:all
-
-# Optional: specific Windows architectures for troubleshooting
-npm run dist:win:x64
-npm run dist:win:arm64
+signboard --help
+signboard work add 'Prepare proposal' --kind story --sprint current --json
+# Use the returned story ID:
+signboard work add 'Compare options' --parent STORY_ID --estimate 2 --json
+signboard work edit TASK_ID --status Doing
+signboard taskboard --json
+signboard taskboard --watch --json
 ```
 
-### Linux (AppImage, deb, Arch/Omarchy)
+Commands accept `--board /absolute/path`. Existing `cards`, `lists`, `archive`, `settings` and `import` commands remain available: `signboard legacy-help`. See [CLI guide](docs/signboard-cli.md).
+
+## Storage and limits
+
+Cards remain Markdown files with YAML frontmatter. Sprint definitions live in `sprints.json`; card metadata holds kind, parent, sprint, estimate and blocker. Sprint closing preserves its tasks. Moving a story to another sprint does not silently move its children; carry tasks over explicitly.
+
+Capacity and estimates are hours. Totals count task cards, excluding their parent stories. Unknown estimates remain visible. Capacity is a planning comparison, not an automatic schedule or calendar integration. There are no burndown charts.
+
+CLI processes serialise board access using an exclusive lock in the CLI config directory and use upstream atomic file writes. A crashed process can leave a lock; only remove it after confirming the owning PID is no longer running. External text editors and other Signboard versions do not participate in this lock. Avoid simultaneous external edits. See [storage](docs/file-format.md) and [architecture](docs/architecture.md).
+
+## Development
 
 ```bash
-# Specific Linux architecture
-npm run dist:linux:x64
-npm run dist:linux:arm64
-
-# Build both Linux architectures
-npm run dist:linux:all
-
-# Optional: RPM-only builds (requires rpmbuild in PATH)
-npm run dist:linux:rpm:x64
-npm run dist:linux:rpm:arm64
-npm run dist:linux:rpm:all
-
-# Optional: Arch/Omarchy-only builds
-npm run dist:linux:pacman:x64
-npm run dist:linux:pacman:arm64
-npm run dist:linux:pacman:all
+npm ci --ignore-scripts
+npm test
+npm run test:upstream
 ```
 
-### Build everything
+QML lives in `qml/Taskboard.qml`; the root manifest follows Omarchy's plugin contract. It uses the shell's theme colours. Changes in an installed user plugin are reloaded by Omarchy. No Electron build or web server is required.
 
-```bash
-# Public release matrix: macOS universal, Windows installer, Linux x64 + ARM64
-npm run dist:all
-```
-
-Notes:
-- `--publish never` is used for local builds so these commands package artifacts without attempting to publish releases.
-- Standard public downloads are: macOS universal, one Windows installer, and Linux `AppImage`/`deb`/Arch packages for `x64` and `ARM64`.
-- The GitHub release body should be treated as the curated download surface. Link the public download set there instead of expecting users to interpret the raw asset list.
-- Copy `.env-sample` to `.env` and fill in your credentials before running signing/notarization builds.
-- macOS signing/notarization uses environment variables from `.env` (`APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, and `APPLE_TEAM_ID`).
-
----
-
-## 🤝 Contributing
-
-Contributions in all forms are welcome!  
-
-Thanks to [Marcus Holtz (@MarcusHoltz)](https://github.com/MarcusHoltz) for contributing 42 color schemes in [#58](https://github.com/cdevroe/signboard/issues/58) and Planner scheme inheritance in [#59](https://github.com/cdevroe/signboard/issues/59). The new schemes include contrast adjustments for readable text and controls.
-
-- **Report bugs**: Open an [Issue](https://github.com/cdevroe/signboard/issues).
-- **Suggest features**: Open an [Issue](https://github.com/cdevroe/signboard/issues) with the `enhancement` label.
-- **Submit fixes or features**: Fork the repo, make your changes, and open a [Pull Request](https://github.com/cdevroe/signboard/pulls).
-
-### Contribution Guidelines
-- Keep PRs focused: one change per PR makes reviews faster.
-- Be respectful and constructive in discussions.
-
----
-
-## 💖 Sponsor the Project
-
-Signboard 1.7.x includes an in-app sponsorship modal with two options:
-
-- Personal use: free, with an optional tip in any amount
-- Commercial use: requested one-time payment
-
----
-
-## 📜 License
-
-The source code in this repository is licensed under the [MIT](./LICENSE) license.
-
-[MIT](./LICENSE) © 2025-2026 Colin Devroe - https://cdevroe.com
-
-Important clarification:
-
-- The MIT license allows personal and commercial use of the source code.
-- In Signboard 1.7.x, the in-app `$49` commercial-use payment is an optional one-time sponsorship. The planned Signboard 2.0 Pro subscription is described above.
-- The optional personal-use tip is also a sponsorship mechanism, not a separate software license.
-
-# Third-Party Notices
-
-My thanks to [John Gruber](https://daringfireball.net/) for creating [Markdown](https://daringfireball.net/projects/markdown/) and to [Steph Ango](https://stephango.com/), CEO of [Obsidian](https://obsidian.md/), for his [File over app philosophy](https://stephango.com/file-over-app).
-
-Signboard includes the following open source libraries:
-
-- [Turndown](https://github.com/mixmark-io/turndown) – [MIT License](https://github.com/mixmark-io/turndown/blob/master/LICENSE)
-- [OverType](https://github.com/panphora/overtype) - [MIT License](https://github.com/panphora/overtype/blob/main/LICENSE)
-- [SortableJS](https://github.com/SortableJS/Sortable) – [MIT License](https://github.com/SortableJS/Sortable/blob/master/LICENSE)
-- [Feather Icons](https://github.com/feathericons/feather) – [MIT License](https://github.com/feathericons/feather/blob/master/LICENSE)
-- [fDatepicker](https://github.com/liedekef/fdatepicker) – [MIT License](https://github.com/liedekef/fdatepicker/blob/master/LICENSE.md)
+MIT licence; upstream copyright is retained in [LICENSE](LICENSE).

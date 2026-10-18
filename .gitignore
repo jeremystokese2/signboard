@@ -1,12 +1,6 @@
 node_modules
 .DS_Store
 .env
-certificate.p12
-dist
-app/signboard.js
-.playwright-mcp/
-signboard-pro-mobile.png
-wordpress-plugin/signboard-smart-actions*.zip
 
 # Research, QA output, and agent handoff notes stay on this computer.
 .local/

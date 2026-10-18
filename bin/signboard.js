@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-const { runCli } = require('../lib/cliApp');
+const { main } = require('../lib/sprintCli');
 
-runCli(process.argv.slice(2), { commandName: 'signboard' })
+main(process.argv.slice(2))
   .then((exitCode) => {
     process.exitCode = Number.isInteger(exitCode) ? exitCode : 0;
   })
