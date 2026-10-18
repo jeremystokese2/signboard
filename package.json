@@ -1,6 +1,6 @@
 {
   "name": "signboard-omarchy",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Personal sprint taskboard for Omarchy, maintained through a CLI and agents.",
   "license": "MIT",
   "author": "Jeremy Stokes; based on Signboard by Colin Devroe",

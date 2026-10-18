@@ -25,7 +25,7 @@ cd signboard
 ./scripts/install.sh
 ```
 
-The installer installs Node dependencies without lifecycle scripts, links this checkout into the user plugin directory, links the CLI under `~/.local/bin`, and enables the plugin. It refuses to replace an unrelated existing plugin or CLI. Keep the checkout in place while installed.
+The installer installs Node dependencies without lifecycle scripts, links this checkout into the user plugin directory, links the CLI under `~/.local/bin`, and enables the plugin. A task-list icon appears on the right of the bar; click it to open or close the board. The installer refuses to replace an unrelated existing plugin or CLI. Keep the checkout in place while installed.
 
 ```bash
 signboard init ~/Documents/Workboard

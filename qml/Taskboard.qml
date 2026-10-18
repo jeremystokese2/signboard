@@ -15,9 +15,9 @@ Item {
     property string selectedId: ""
     property string errorMessage: ""
     property string agentMessage: ""
-    property var data: ({ rows: [], columns: ["To do", "Doing", "Waiting", "Done"], sprints: [], totals: {} })
+    property var boardData: ({ rows: [], columns: ["To do", "Doing", "Waiting", "Done"], sprints: [], totals: {} })
     readonly property string cli: decodeURIComponent(Qt.resolvedUrl("../bin/signboard.js").toString().replace(/^file:\/\//, ""))
-    readonly property var choices: [{ label: "Current sprint", value: "current" }, { label: "Backlog", value: "backlog" }, { label: "All work", value: "all" }].concat(data.sprints.map(s => ({ label: s.name + " · " + s.status, value: s.id })))
+    readonly property var choices: [{ label: "Current sprint", value: "current" }, { label: "Backlog", value: "backlog" }, { label: "All work", value: "all" }].concat(boardData.sprints.map(s => ({ label: s.name + " · " + s.status, value: s.id })))
     readonly property var selected: findItem(selectedId)
     readonly property color fg: Color.foreground
     readonly property color bg: Color.background
@@ -26,7 +26,7 @@ Item {
     readonly property color line: Qt.alpha(fg, 0.15)
 
     function findItem(id) {
-        for (let row of data.rows) {
+        for (let row of boardData.rows) {
             if (row.story.id && row.story.id === id) return row.story
             for (let task of row.tasks) if (task.id === id) return task
         }
@@ -69,7 +69,7 @@ Item {
         id: watcher
         stdout: SplitParser {
             onRead: line => {
-                try { root.data = JSON.parse(line); root.errorMessage = "" } catch (e) { root.errorMessage = "Could not read the board: " + e }
+                try { root.boardData = JSON.parse(line); root.errorMessage = "" } catch (e) { root.errorMessage = "Could not read the board: " + e }
             }
         }
         stderr: SplitParser { onRead: line => root.errorMessage = line }
@@ -147,8 +147,8 @@ Item {
                 Layout.fillWidth: true
                 ColumnLayout {
                     Layout.fillWidth: true
-                    Text { text: root.data.name || "Signboard"; color: root.fg; font.pixelSize: 24; font.bold: true }
-                    Text { text: root.data.sprint ? root.data.sprint.goal || "Set a goal for this sprint" : "Capture work, split it into tasks, and choose what to take on."; color: root.muted; elide: Text.ElideRight; Layout.fillWidth: true }
+                    Text { text: root.boardData.name || "Signboard"; color: root.fg; font.pixelSize: 24; font.bold: true }
+                    Text { text: root.boardData.sprint ? root.boardData.sprint.goal || "Set a goal for this sprint" : "Capture work, split it into tasks, and choose what to take on."; color: root.muted; elide: Text.ElideRight; Layout.fillWidth: true }
                 }
                 ComboBox {
                     id: sprintPicker
@@ -162,16 +162,16 @@ Item {
             }
             RowLayout {
                 spacing: 24
-                Text { text: (root.data.totals.done || 0) + " / " + (root.data.totals.tasks || 0) + " tasks done"; color: root.fg }
+                Text { text: (root.boardData.totals.done || 0) + " / " + (root.boardData.totals.tasks || 0) + " tasks done"; color: root.fg }
                 Text {
-                    text: (root.data.totals.doing || 0) + " doing" + (root.data.totals.wipLimit ? " / " + root.data.totals.wipLimit + " WIP limit" : "")
-                    color: root.data.totals.wipLimit && root.data.totals.doing > root.data.totals.wipLimit ? Color.urgent : root.fg
+                    text: (root.boardData.totals.doing || 0) + " doing" + (root.boardData.totals.wipLimit ? " / " + root.boardData.totals.wipLimit + " WIP limit" : "")
+                    color: root.boardData.totals.wipLimit && root.boardData.totals.doing > root.boardData.totals.wipLimit ? Color.urgent : root.fg
                 }
                 Text {
-                    text: (root.data.totals.estimatedHours || 0) + "h planned" + (root.data.totals.capacityHours !== null && root.data.totals.capacityHours !== undefined ? " / " + root.data.totals.capacityHours + "h capacity" : "")
-                    color: root.data.totals.capacityHours !== null && root.data.totals.estimatedHours > root.data.totals.capacityHours ? Color.urgent : root.fg
+                    text: (root.boardData.totals.estimatedHours || 0) + "h planned" + (root.boardData.totals.capacityHours !== null && root.boardData.totals.capacityHours !== undefined ? " / " + root.boardData.totals.capacityHours + "h capacity" : "")
+                    color: root.boardData.totals.capacityHours !== null && root.boardData.totals.estimatedHours > root.boardData.totals.capacityHours ? Color.urgent : root.fg
                 }
-                Text { text: (root.data.totals.unestimated || 0) + " unestimated"; color: root.muted }
+                Text { text: (root.boardData.totals.unestimated || 0) + " unestimated"; color: root.muted }
                 Item { Layout.fillWidth: true }
             }
             Text { visible: !!root.errorMessage; text: root.errorMessage; color: Color.urgent; wrapMode: Text.Wrap; Layout.fillWidth: true }
@@ -196,12 +196,12 @@ Item {
                             spacing: 8
                             Text { width: 180; text: "WORK ITEM"; color: root.muted; font.pixelSize: 12; height: 30 }
                             Repeater {
-                                model: root.data.columns
-                                Text { required property string modelData; width: (boardRows.width - 188) / root.data.columns.length - 8; text: modelData.toUpperCase(); color: root.muted; font.pixelSize: 12; height: 30 }
+                                model: root.boardData.columns
+                                Text { required property string modelData; width: (boardRows.width - 188) / root.boardData.columns.length - 8; text: modelData.toUpperCase(); color: root.muted; font.pixelSize: 12; height: 30 }
                             }
                         }
                         Repeater {
-                            model: root.data.rows
+                            model: root.boardData.rows
                             Rectangle {
                                 id: swimlane
                                 required property var modelData
@@ -223,11 +223,11 @@ Item {
                                         BoardButton { visible: !!swimlane.modelData.story.id; text: "View / prompt"; onClicked: root.selectedId = swimlane.modelData.story.id }
                                     }
                                     Repeater {
-                                        model: root.data.columns
+                                        model: root.boardData.columns
                                         Column {
                                             id: statusCell
                                             required property string modelData
-                                            width: (boardRows.width - 188) / root.data.columns.length - 8
+                                            width: (boardRows.width - 188) / root.boardData.columns.length - 8
                                             spacing: 8
                                             Repeater {
                                                 model: swimlane.modelData.tasks.filter(t => t.status === statusCell.modelData)
@@ -239,7 +239,7 @@ Item {
                             }
                         }
                         Text {
-                            visible: root.data.rows.length === 0
+                            visible: root.boardData.rows.length === 0
                             width: parent.width
                             padding: 32
                             text: "This view has no work yet. Ask your agent to capture a work item and break it into tasks."

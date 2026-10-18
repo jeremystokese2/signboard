@@ -2,10 +2,17 @@
   "schemaVersion": 1,
   "id": "jeremy.signboard",
   "name": "Signboard",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "Jeremy Stokes; based on Signboard by Colin Devroe",
   "license": "MIT",
   "description": "Personal sprint taskboard with an agent prompt and a Markdown CLI.",
-  "kinds": ["panel"],
-  "entryPoints": { "panel": "qml/Taskboard.qml" }
+  "kinds": ["panel", "bar-widget"],
+  "entryPoints": { "panel": "qml/Taskboard.qml", "barWidget": "qml/Launcher.qml" },
+  "barWidget": {
+    "displayName": "Signboard",
+    "description": "Open your personal sprint taskboard",
+    "category": "Productivity",
+    "defaultSection": "right",
+    "allowMultiple": false
+  }
 }

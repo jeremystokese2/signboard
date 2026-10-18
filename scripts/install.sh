@@ -19,5 +19,25 @@ else
   ln -s "$project_dir/bin/signboard.js" "$bin_dir/signboard"
 fi
 omarchy-shell shell rescanPlugins
-omarchy plugin enable jeremy.signboard
-echo 'Installed. Create a board with signboard init <folder>, then run signboard gui.'
+# The shell scans manifests asynchronously. Enable only after it has seen
+# both entry points, including when upgrading an existing panel-only install.
+registered=false
+for attempt in {1..30}; do
+  if omarchy-shell shell listPlugins | node -e '
+    let input = "";
+    process.stdin.on("data", chunk => input += chunk);
+    process.stdin.on("end", () => {
+      try {
+        process.exit(JSON.parse(input).some(p => p.id === "jeremy.signboard" && p.kinds.includes("bar-widget")) ? 0 : 1);
+      } catch { process.exit(1); }
+    });
+  '; then
+    registered=true
+    break
+  fi
+  sleep 0.2
+done
+[[ $registered == true ]] || { echo 'Signboard registration timed out. Check that the Omarchy shell is running.' >&2; exit 1; }
+omarchy plugin enable jeremy.signboard --section right
+echo 'Installed. Click the Signboard task-list icon in the bar to open your board.'
+echo 'For a new board, run: signboard init <folder>'
